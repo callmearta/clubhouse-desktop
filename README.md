@@ -10,3 +10,8 @@ Also this is my first ever try at electron, vue, and agora. So if you've decompi
 
 For downloading the Mac/Linux version go to releases section.
 https://github.com/callmearta/clubhouse-desktop/releases
+
+
+# Screenshot
+
+![Screenshot](https://github.com/callmearta/clubhouse-desktop/blob/main/Screen%20Shot%202021-03-14%20at%2018.01.56.png?raw=true)
