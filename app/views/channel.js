@@ -83,9 +83,13 @@ const Channel = {
     },
     beforeDestroy:function(){
         // this.leave();
+        console.log('beforeDestroy Channel.');
         clearInterval(this.activePingInterval);
+        this.activePingInterval = null;
         clearInterval(this.onlineFriendsInterval);
+        this.onlineFriendsInterval = null;
         clearInterval(this.channelsInterval);
+        this.channelsInterval = null;
         if(pubnub){
             pubnub.unsubscribeAll();
             pubnub = null;
@@ -380,7 +384,6 @@ const Channel = {
                 client = AgoraRTC.createClient({mode:'rtc',codec:'vp8'});
                 client.init('938de3e8055e42b281bb8c6f69c21f78');
                 client.enableAudioVolumeIndicator(50,0);
-                // client.enableDualStream();
 
                 client.join(result.token,result.channel,userData.user_profile.user_id,async uid => {
                     stream = AgoraRTC.createStream({
@@ -391,6 +394,7 @@ const Channel = {
                     });
                     stream.init(() => {
                         if(client){
+                            stream.enableAudio();
                             client.publish(stream,err => console.error(err));
                         }
                     });
@@ -404,20 +408,7 @@ const Channel = {
                     }
                 });
                 client.on("stream-added", async function(evt){
-                    if(client && evt && evt.stream){
-                        client.subscribe(evt.stream,{video:false,audio:true}, err => {
-                            console.error(err);
-                            client.subscribe(evt.stream);
-                        });
-                    }
-                    client.setStreamFallbackOption(evt.stream, 0);
-
-                    
-                    const userIndex = $this.users.findIndex(i => i && i.user_id == evt.stream.getId());
-                    if(userIndex > -1 && !$this.users[userIndex].speaking){
-                        let newUsers = [...$this.users];
-                        $this.$set($this.users,userIndex,{...newUsers[userIndex],speaking:true,unmute:true});
-                    }
+                    $this.subscribeStream(evt);
                 });
                 client.on("active-speaker", function(evt){
                     const userIndex = $this.users.findIndex(i => i && i.user_id == evt.uid);
@@ -439,10 +430,6 @@ const Channel = {
                 });
                 client.on("stream-subscribed", function(evt){
                     let stream = evt.stream;
-                    stream.setAudioVolume(100);
-                    let streamId = String(stream.getId());
-
-                    // stream.play('app');
 
                     const streamExists = $this.streams.findIndex(s => s.getId() == stream.getId());
                     if(streamExists && streamExists.audioContext > -1){
@@ -457,10 +444,6 @@ const Channel = {
                 });
                 client.on("stream-removed", function (evt) {
                     let stream = evt.stream;
-
-                    // if(document.getElementById('player_'+stream.getId())){
-                    //     document.getElementById('player_'+stream.getId()).remove();
-                    // }
                     const userIndex = $this.users.findIndex(i => i && i.user_id == stream.getId());
 
                     if(userIndex > -1){
@@ -468,17 +451,8 @@ const Channel = {
                         $this.$set($this.users,userIndex,{...newUsers[userIndex],speaking:false});
                     }
                     
-                    // $this.streams.splice($this.streams.findIndex(s => s.getId() == stream.getId()),1);
+                    $this.streams.splice($this.streams.findIndex(s => s.getId() == stream.getId()),1);
                 });
-                // client.on('close',function(evt){
-                //     let stream = evt.stream
-    
-                //     const userIndex = $this.users.findIndex(i => i.user_id == stream.getId());
-                //     if(userIndex > -1){
-                //         let newUsers = [...$this.users];
-                //         $this.$set($this.users,userIndex,{...newUsers[userIndex],speaking:false});
-                //     }
-                // });
                 client.on('mute-audio',function(evt){
                     const userIndex = $this.users.findIndex(i => i && i.user_id == evt.uid);
                     if(userIndex > -1){
@@ -493,12 +467,21 @@ const Channel = {
                         $this.$set($this.users,userIndex,{...newUsers[userIndex],unmute:true});
                     }
                 });
-                client.on('peer-leave',function(evt){
-                    const userIndex = $this.users.findIndex(i => i && i.user_id == evt.uid);
-                    if(userIndex > -1){
-                        // $this.users.splice(userIndex,1);
-                    }
+        },
+        subscribeStream: function(evt){
+            const $this = this;
+            if(client && evt && evt.stream){
+                client.subscribe(evt.stream,{video:false,audio:true}, err => {
+                    console.error(err);
+                    return $this.subscribeStream(evt);
                 });
+            }
+            
+            const userIndex = this.users.findIndex(i => i && i.user_id == evt.stream.getId());
+            if(userIndex > -1 && !this.users[userIndex].speaking){
+                let newUsers = [...this.users];
+                this.$set(this.users,userIndex,{...newUsers[userIndex],speaking:true,unmute:true});
+            }
         },
         leave: async function(){
             const userData = store.get('userData');
@@ -631,7 +614,7 @@ const Channel = {
                 console.log(result);
                 if(result.success){
                     this.channelsResult = result;
-                    this.channels = result.channels.filter(channel => isLatinString(channel.topic));
+                    this.channels = result.channels.filter(channel => store.get('settings').filterEastern ? isLatinString(channel.topic) : true);
                     this.channelsLoading = false;
                     if(this.channelsInterval){
                         clearInterval(this.channelsInterval);

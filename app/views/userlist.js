@@ -30,7 +30,7 @@ const UserList = {
                 userId: userData.user_profile.user_id,
                 token: userData.auth_token
             };
-            const result = await ClubHouseApi.api.getFollowers(profile,parseInt(this.id));
+            const result = await ClubHouseApi.api.getFollowers(profile,Number(this.id));
             console.log(result);
             if(result.success){
                 this.users = result.users;
@@ -49,7 +49,7 @@ const UserList = {
                 userId: userData.user_profile.user_id,
                 token: userData.auth_token
             };
-            const result = await ClubHouseApi.api.getFollowing(profile,parseInt(this.id));
+            const result = await ClubHouseApi.api.getFollowing(profile,Number(this.id));
             console.log(result);
             if(result.success){
                 this.users = result.users;

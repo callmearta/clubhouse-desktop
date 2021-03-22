@@ -105,5 +105,8 @@ app.on('activate', async () => {
 	await app.whenReady();
 	Menu.setApplicationMenu(menu);
 	mainWindow = await createMainWindow();
-
+	mainWindow.webContents.on('new-window', function(e, url) {
+		e.preventDefault();
+		require('electron').shell.openExternal(url);
+	  });
 })();

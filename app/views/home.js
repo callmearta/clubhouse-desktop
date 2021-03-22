@@ -40,8 +40,11 @@ const Home = {
         this.getOnlineFriends();
     },
     beforeDestroy:function(){
+        console.log('beforeDestroy Home');
         clearInterval(this.channelsInterval);
+        this.channelsInterval = null;
         clearInterval(this.onlineFriendsInterval);
+        this.onlineFriendsInterval = null;
     },
     data:function(){
         return{
@@ -71,7 +74,9 @@ const Home = {
             onlineFriendsLoading: true,
             onlineFriendsInterval: null,
             newRoomFriends:[],
-            newRoomType: null
+            newRoomType: null,
+            theme: window.theme,
+            roomsKeyword: ''
         }
     },
     methods:{
@@ -127,7 +132,7 @@ const Home = {
                 console.log(result);
                 if(result.success){
                     this.channelsResult = result;
-                    this.channels = result.channels.filter(channel => isLatinString(channel.topic));
+                    this.channels = result.channels.filter(channel => store.get('settings').filterEastern ? isLatinString(channel.topic) : true);
                     this.channelsLoading = false;
                     if(this.channelsInterval){
                         clearInterval(this.channelsInterval);
@@ -200,6 +205,21 @@ const Home = {
                 }
             }
         },
+        switchTheme: function(){
+            if(this.theme == 'light'){
+                localStorage.setItem('theme','dark');
+                window.theme = 'dark';
+                this.theme = 'dark';
+                document.body.classList.remove('light');
+                document.body.classList.add('dark');
+            }else{
+                localStorage.setItem('theme','light');
+                window.theme = 'light';
+                this.theme = 'light';
+                document.body.classList.remove('dark');
+                document.body.classList.add('light');
+            }
+        }
     },
     template: `
         <div class="p-5 home">
@@ -310,6 +330,10 @@ const Home = {
                         <input type="text" placeholder="Search" v-model="searchQuery" />
                         <i class="far fa-search" @click="search"></i>
                     </form>
+                    <span class="mr-4 btn-light cursor-pointer" @click="switchTheme">
+                        <i class="far fa-moon" v-if="theme == 'dark'"></i>
+                        <i class="fas fa-sun" v-if="theme == 'light'"></i>
+                    </span>
                     <span class="mr-4 btn-light cursor-pointer has-badge" @click="$router.push({name:'notifications'})">
                         <em class="badge" v-if="myProfile && myProfile.has_unread_notifications"></em>
                         <i class="far fa-bell"></i>
@@ -360,10 +384,16 @@ const Home = {
                 </div>
             </div>
             
-            <h5 class="mt-4">Rooms</h5>
+            <div class="d-flex align-items-center justify-content-start mt-4 mb-2">
+                <h5>Rooms</h5>
+                <div class="search-input ml-3">
+                    <input type="text" placeholder="Search in current rooms..." v-model="roomsKeyword" />
+                    <i class="far fa-search"></i>
+                </div>
+            </div>
             <div class="loading" v-if="channelsLoading"><div></div><div></div><div></div><div></div></div>
             <transition-group tag="div" name="channel" class="channels" v-if="!channelsLoading">
-                <router-link :to="{name:'channel',params:{id: channel.channel_id, name: channel.channel}}" class="channel card my-2" v-for="channel in channels" :key="channel.channel_id">
+                <router-link :to="{name:'channel',params:{id: channel.channel_id, name: channel.channel}}" class="channel card my-2" v-for="channel in (roomsKeyword ? channels.filter(c => c.topic && c.topic.toLowerCase().includes(roomsKeyword.toLowerCase())) : channels)" :key="channel.channel_id">
                     <div class="card-body p-3">
                         <h5 class="mb-0">{{channel.topic}}</h5>
                         <div class="channel-users" v-if="channel.users.length">

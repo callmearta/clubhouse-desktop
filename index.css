@@ -25,6 +25,11 @@ body {
 	color: var(--text-color);
 }
 
+body,
+html {
+	overflow-x: hidden;
+}
+
 #app {
 	/* padding: 1rem; */
 }
@@ -744,7 +749,7 @@ input {
 }
 
 @media (prefers-color-scheme: dark) {
-	:root {
+	body.dark {
 		--bg-color: rgb(31, 41, 55);
 		--cream-color: rgb(57, 71, 90);
 		--text-color: rgb(202, 202, 202);
@@ -753,38 +758,38 @@ input {
 		--primary-color-hover: rgb(53, 51, 68);
 		--primary-color-opacity: rgba(65, 62, 83, 0.75);
 	}
-	a:hover {
+	body.dark a:hover {
 		color: rgba(255, 255, 255, 0.5);
 	}
-	.form-control,
-	.form-control:focus,
-	.form-control:focus {
+	body.dark .form-control,
+	body.dark .form-control:focus,
+	body.dark .form-control:focus {
 		background: rgba(255, 255, 255, 0.1) !important;
 		color: var(--text-color) !important;
 	}
-	.search-input {
+	body.dark .search-input {
 		background: rgba(255, 255, 255, 0.05);
 	}
-	.border-bottom {
+	body.dark .border-bottom {
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 	}
-	.border-top {
+	body.dark .border-top {
 		border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 	}
-	.btn-grey {
+	body.dark .btn-grey {
 		color: var(--text-color);
 	}
-	.btn-light:hover,
-	.btn-grey:hover {
+	body.dark .btn-light:hover,
+	body.dark .btn-grey:hover {
 		background: var(--primary-color-hover) !important;
 	}
-	.user.isSpeaking .user-img {
+	body.dark .user.isSpeaking .user-img {
 		border: 5px solid rgb(177, 165, 221);
 	}
-	.custom-radio label {
+	body.dark .custom-radio label {
 		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
-	.custom-radio input:checked + label {
+	body.dark .custom-radio input:checked + label {
 		background: rgba(0, 0, 0, 0.2);
 	}
 }
@@ -840,12 +845,12 @@ a i {
 	font-style: normal;
 }
 
-.badge:empty{
-	display:block !important;
-	width:10px;
-	height:10px;
-	right:-1px;;
-	top:-1px;
+.badge:empty {
+	display: block !important;
+	width: 10px;
+	height: 10px;
+	right: -1px;
+	top: -1px;
 }
 
 .follow-badge {
@@ -856,13 +861,38 @@ a i {
 	bottom: 0.5rem;
 }
 
-.home,.channel-page {
+.new-image-badge {
+	width: auto;
+	padding: 0.7rem;
+	font-size: 1rem;
+	top: initial;
+	bottom: 0rem;
+	cursor: pointer;
+}
+
+.new-image-badge input {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	-webkit-appearance: none;
+	appearance: none;
+	cursor: pointer;
+}
+
+.home,
+.channel-page {
 	padding-top: calc(70px + 2rem) !important;
 	padding-right: calc(200px + 2rem) !important;
 }
 
-.channel-page{
-	padding-left:calc(200px + 2rem) !important;
+.channel-page {
+	padding-left: calc(200px + 2rem) !important;
 }
 
 .header {
@@ -1061,7 +1091,7 @@ a i {
 
 .events-wrapper .events {
 	width: 100%;
-	height: 200px;
+	height: 220px;
 	overflow: auto;
 	display: flex;
 	align-items: center;
@@ -1079,85 +1109,150 @@ a i {
 	border-radius: 15px;
 }
 
-.other-channels{
-	width:200px;
-	height:100vh;
-	position:fixed;
-	left:0;
-	top:70px;
-	background:var(--white-color);
-	padding:1rem;
-	padding-bottom:90px !important;
-	overflow:auto;
-	margin-top:0 !important;
+.other-channels {
+	width: 200px;
+	height: 100vh;
+	position: fixed;
+	left: 0;
+	top: 70px;
+	background: var(--white-color);
+	padding: 1rem;
+	padding-bottom: 90px !important;
+	overflow: auto;
+	margin-top: 0 !important;
 	border-radius: 0 !important;
 }
 
-.channel-h{
-	width:100%;
-	margin-bottom:1rem;
+.channel-h {
+	width: 100%;
+	margin-bottom: 1rem;
 }
 
-.channel-h.current{
-	background:var(--bg-color);
+.channel-h.current {
+	background: var(--bg-color);
 	position: relative;
-    right: 0.5rem;
-    width: calc(100% + 1.5rem);
+	right: 0.5rem;
+	width: calc(100% + 1.5rem);
 	border-top-left-radius: 15px;
 	border-bottom-left-radius: 15px;
-	padding:1rem;
+	padding: 1rem;
 }
 
-.channel-h-inner{
-	width:100%;
-	display:flex;
+.channel-h-inner {
+	width: 100%;
+	display: flex;
 }
 
-.channel-h-imgs{
-	width:50px;
-	height:50px;
-	position:relative;
+.channel-h-imgs {
+	width: 50px;
+	height: 50px;
+	position: relative;
 	flex: 0 0 auto;
 }
 
-.channel-h-body{
-	width:calc(100% - 60px);
-	padding-left:.5rem;
+.channel-h-body {
+	width: calc(100% - 60px);
+	padding-left: 0.5rem;
 }
 
-.channel-h ul{
+.channel-h ul {
 	list-style: none;
-	margin:0;
-	font-size:.6rem;
-	font-weight:100;
-	color:var(--text-color);
-	padding:0;
+	margin: 0;
+	font-size: 0.6rem;
+	font-weight: 100;
+	color: var(--text-color);
+	padding: 0;
 }
-.channel-h strong{
-	font-size:.8rem;
-	margin-bottom:.25rem;
-	display:block;
-}
-
-.channel-h-imgs img:first-child{
-	width:40px;
-	height:40px;
-	border-radius:45%;
-	position:absolute;
-	top:0;
-	left:0;
-	z-index:2
+.channel-h strong {
+	font-size: 0.8rem;
+	margin-bottom: 0.25rem;
+	display: block;
 }
 
-.channel-h-imgs img:last-child{
-	width:40px;
-	height:40px;
-	border-radius:45%;
-	position:absolute;
-	bottom:0;
-	right:0;
-	z-index:1;
+.channel-h-imgs img:first-child {
+	width: 40px;
+	height: 40px;
+	border-radius: 45%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
 }
-.channel-h .channel-meta{
-	font-size:.6rem !important;
+
+.channel-h-imgs img:last-child {
+	width: 40px;
+	height: 40px;
+	border-radius: 45%;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: 1;
+}
+.channel-h .channel-meta {
+	font-size: 0.6rem !important;
+}
+
+.fa-twitter {
+	color: rgb(43, 156, 197);
+}
+
+.fa-instagram {
+	color: rgb(100, 67, 67);
+}
+
+::-webkit-scrollbar {
+	height: 4px;
+	width: 4px;
+	border-radius: 5px;
+	background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(0, 0, 0, 0.5);
+	border-radius: 5px;
+}
+
+.clubs {
+	width: 100%;
+	height: 95px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	overflow: auto;
+	white-space: nowrap;
+	flex-wrap: nowrap;
+}
+
+.club {
+	width: 60px;
+	height: 75px;
+	margin-right: 0.5rem;
+}
+
+.club-img {
+	width: 60px;
+	height: 60px;
+	margin-bottom: 5px;
+	border-radius: 45%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.club-img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.club span {
+	font-size: 0.7rem;
+	width: 100%;
+	max-width: 100%;
+	overflow: hidden;
+	display: block;
+	text-overflow: ellipsis;
+	text-align: center;
+	color: var(--text-color) !important;
 }

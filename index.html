@@ -8,12 +8,20 @@
 	<body>
 		<div id="app">
 			<router-view></router-view>
-			<!-- <input type="tel" v-model="phone" />
-			<button @click="smsAuth">Send SMS</button>
-			<button @click="callAuth">Call</button> -->
 		</div>
 
 		<script src="app/a.js"></script>
 		<script src="app/main.js" type="module"></script>
+		<script type="text/javascript">
+			let theme = localStorage.getItem("theme");
+			if (!theme) {
+				theme = "light";
+				localStorage.setItem("theme", "light");
+			}
+			window.theme = theme;
+			if (!document.body.classList.contains(theme)) {
+				document.body.classList.add(theme);
+			}
+		</script>
 	</body>
 </html>

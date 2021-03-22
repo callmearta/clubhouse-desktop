@@ -16,6 +16,7 @@ import User from './views/user.js';
 import UserList from './views/userlist.js';
 import EditProfile from './views/editProfile.js';
 import Notifications from './views/notifications.js';
+import Club from './views/club.js';
 
 import UserComponent from './components/user.js';
 import UserHComponent from './components/user-h.js';
@@ -100,6 +101,12 @@ const routes = [
     path: '/notifications',
     component: Notifications,
     name: 'notifications'
+  },
+  {
+    path: '/club/:id',
+    component: Club,
+    name: 'club',
+    props: true
   }
 ]
 const router = new VueRouter({
@@ -110,6 +117,13 @@ const app = new Vue({
   mounted:function(){
     document.oncontextmenu = function() {
       return false;
+    }
+    const settings = store.get('settings');
+    if(!settings){
+      store.set('settings',{
+        filterEastern: true,
+        filterRooms: []
+      });
     }
     const userData = store.get('userData');
     if(userData && userData.user_profile.user_id){
