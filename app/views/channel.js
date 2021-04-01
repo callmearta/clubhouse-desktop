@@ -432,7 +432,7 @@ const Channel = {
                     let stream = evt.stream;
 
                     const streamExists = $this.streams.findIndex(s => s.getId() == stream.getId());
-                    if(streamExists && streamExists.audioContext > -1){
+                    if(streamExists > -1 && streamExists.audioContext){
                         streamExists.audioContext.play();
                     }else{
                         let audio = new Audio();
