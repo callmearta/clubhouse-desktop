@@ -321,7 +321,7 @@ const User = {
                     <h1 class="h5 mb-0 mt-3">{{user.user_profile.name}}<i class="far fa-pencil ml-2 cursor-pointer" @click="editName.modalVisible = true" v-if="isMe && user.user_profile.can_edit_name"></i></h1>
                     <small class="text-muted">@{{user.user_profile.username}}<i class="far fa-pencil ml-2 cursor-pointer" @click="editUsername.modalVisible = true" v-if="isMe && user.user_profile.can_edit_username"></i></small>
                     <small class="text-muted">Joined At: {{new Date(user.user_profile.time_created).toDateString()}}</small>
-                    <button class="btn-primary mt-3" @click="follow" v-if="!isMe && !user.user_profile.notification_type">Follow</button>
+                    <button class="btn-primary mt-3" @click="follow" v-if="!isMe && user.user_profile.notification_type !== 2">Follow</button>
                     <button class="btn-primary mt-3" @click="unfollow" v-if="!isMe && user.user_profile.notification_type === 2">Unfollow</button>
                     <small class="text-muted mt-2" v-if="user.user_profile.mutual_follows.length">Followed By {{user.user_profile.mutual_follows.reduce((p1,p2) => [...p1,p2.name],[]).join(', ')}}</small>
                     <div class="d-flex align-items-center justify-content-center mt-3">
