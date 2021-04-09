@@ -1256,3 +1256,9 @@ a i {
 	text-align: center;
 	color: var(--text-color) !important;
 }
+
+.online-friend-body .btn-text {
+	width: 80px !important;
+	background: rgb(223, 243, 229) !important;
+	color: rgb(46, 151, 78) !important;
+}

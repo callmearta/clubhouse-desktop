@@ -4,7 +4,7 @@ const store = require('store');
 const Waitlist = {
     beforeRouteEnter: function(to,from,next){
         const userData = store.get('userData');
-        if(userData && userData.is_verified){
+        if(userData && !userData.is_waitlisted){
             next(vm => {
                 vm.$router.replace('/home');
             });

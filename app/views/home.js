@@ -1,227 +1,252 @@
-const ClubHouseApi = require('clubhouse-api');
-const store = require('store');
+const ClubHouseApi = require("clubhouse-api");
+const store = require("store");
 
 function isLatinString(s) {
-    if(s){
-        if(s.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/)){
-            return false;
-        }else{
-            return true;
-        }
-    }else{
-        return true;
-    }
+	if (s) {
+		if (
+			s.match(
+				/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/
+			)
+		) {
+			return false;
+		} else {
+			return true;
+		}
+	} else {
+		return true;
+	}
 }
 
 const Home = {
-    beforeRouteEnter (to, from, next) {
-        const userData = store.get('userData');
-        if(userData && !userData.is_verified){
-            if(!userData.is_verified || userData.is_onboarding || userData.is_waitlisted){
-                next(vm => {
-                    vm.$router.replace({name:'waitlist'});
-                });
-            }
-        }
-        next();
-    },
-    mounted:function(){
-        if(this.userData){
-            this.reqProfile = {
-                ...ClubHouseApi.profiles.application.a304,
-                ...ClubHouseApi.profiles.locales.English,
-                userId: this.userData.user_profile.user_id,
-                token: this.userData.auth_token
-            };
-        }
-        this.getMe();
-        this.getEvents();
-        this.getChannels();
-        this.getOnlineFriends();
-    },
-    beforeDestroy:function(){
-        console.log('beforeDestroy Home');
-        clearInterval(this.channelsInterval);
-        this.channelsInterval = null;
-        clearInterval(this.onlineFriendsInterval);
-        this.onlineFriendsInterval = null;
-    },
-    data:function(){
-        return{
-            userData: store.get('userData'),
-            reqProfile: null,
-            eventsResult: null,
-            events: [],
-            eventsLoading:true,
-            channelsResult: null,
-            channels: [],
-            channelsLoading:true,
-            loading:false,
-            retry: 0,
-            channelsInterval: null,
-            searchQuery: '',
-            newRoom: {
-                modalVisible: false,
-                topic: ''
-            },
-            myProfile:null,
-            newInvite:{
-                modalVisible:false,
-                phone:'',
-                name: ''
-            },
-            onlineFriends:null,
-            onlineFriendsLoading: true,
-            onlineFriendsInterval: null,
-            newRoomFriends:[],
-            newRoomType: null,
-            theme: window.theme,
-            roomsKeyword: ''
-        }
-    },
-    methods:{
-        getOnlineFriends: async function(){
-            const $this = this;
-            const result = await ClubHouseApi.api.getOnlineFriends(this.reqProfile);
-            console.log(result);
-            if(result && result.users){
-                this.onlineFriends = result.users;
-                this.onlineFriendsLoading = false;
-            }
-            else{
-                console.error(result);
-            }
+	beforeRouteEnter(to, from, next) {
+		const userData = store.get("userData");
+		if (userData && !userData.is_verified) {
+			if (
+				!userData.is_verified ||
+				userData.is_onboarding ||
+				userData.is_waitlisted
+			) {
+				next(vm => {
+					vm.$router.replace({ name: "waitlist" });
+				});
+			}
+		}
+		next();
+	},
+	mounted: function() {
+		if (this.userData) {
+			this.reqProfile = {
+				...ClubHouseApi.profiles.application.a304,
+				...ClubHouseApi.profiles.locales.English,
+				userId: this.userData.user_profile.user_id,
+				token: this.userData.auth_token
+			};
+		}
+		this.getMe();
+		this.getEvents();
+		this.getChannels();
+		this.getOnlineFriends();
+	},
+	beforeDestroy: function() {
+		console.log("beforeDestroy Home");
+		clearInterval(this.channelsInterval);
+		this.channelsInterval = null;
+		clearInterval(this.onlineFriendsInterval);
+		this.onlineFriendsInterval = null;
+	},
+	data: function() {
+		return {
+			userData: store.get("userData"),
+			reqProfile: null,
+			eventsResult: null,
+			events: [],
+			eventsLoading: true,
+			channelsResult: null,
+			channels: [],
+			channelsLoading: true,
+			loading: false,
+			retry: 0,
+			channelsInterval: null,
+			searchQuery: "",
+			newRoom: {
+				modalVisible: false,
+				topic: ""
+			},
+			myProfile: null,
+			newInvite: {
+				modalVisible: false,
+				phone: "",
+				name: ""
+			},
+			onlineFriends: null,
+			onlineFriendsLoading: true,
+			onlineFriendsInterval: null,
+			newRoomFriends: [],
+			newRoomType: null,
+			theme: window.theme,
+			roomsKeyword: ""
+		};
+	},
+	methods: {
+		getOnlineFriends: async function() {
+			const $this = this;
+			const result = await ClubHouseApi.api.getOnlineFriends(this.reqProfile);
+			console.log(result);
+			if (result && result.users) {
+				this.onlineFriends = result.users;
+				this.onlineFriendsLoading = false;
+			} else {
+				console.error(result);
+			}
 
-            clearInterval(this.onlineFriendsInterval);
-            this.onlineFriendsInterval = setInterval(function(){
-                $this.getOnlineFriends();
-            },10000);
-        },
-        getMe: async function(){
-            this.loading = true;
-            if(this.userData && this.userData.user_profile){
-                const result = await ClubHouseApi.api.getProfile(this.reqProfile);
-                console.log(result);
-                if(result.success){
-                    this.myProfile = result;
-                    this.loading = false;
-                }else{
-                    console.error(result);
-                }
-            }
-        },
-        getEvents: async function(){
-            if(this.userData && this.userData.user_profile){
-                const result = await ClubHouseApi.api.getEvents(this.reqProfile,true);
-                console.log(result);
-                if(result.success){
-                    this.eventsResult = result;
-                    this.events = result.events;
-                    this.eventsLoading = false;
-                }else{
-                    console.error(result);
-                    store.remove('userData');
-                    this.$router.replace({name:'login'});
-                }
-            }
-        },
-        getChannels: async function(){
-            const $this = this;
-            if(this.userData && this.userData.user_profile){
-                const result = await ClubHouseApi.api.getChannels(this.reqProfile);
-                console.log(result);
-                if(result.success){
-                    this.channelsResult = result;
-                    this.channels = result.channels.filter(channel => store.get('settings').filterEastern ? isLatinString(channel.topic) : true);
-                    this.channelsLoading = false;
-                    if(this.channelsInterval){
-                        clearInterval(this.channelsInterval);
-                    }
-                    this.channelsInterval = setInterval(function(){
-                        $this.getChannels();
-                    },30000);
-                }else{
-                    console.error(result);
-                    if(this.events.length){
-                        this.getChannels();
-                    }else{
-                        if(this.retry < 2){
-                            this.getChannels();
-                            this.retry++;
-                        }else{
-                            store.remove('userData');
-                            this.$router.replace({name:'login'});
-                        }
-                    }
-                }
-
-            }
-        },
-        logout:function(){
-            store.remove('userData');
-            this.$router.replace('/');
-        },
-        createChannel: async function(){
-            const result = await ClubHouseApi.api.createChannel(this.reqProfile,{
-                topic: this.newRoom.topic || '',
-                guests: this.newRoomFriends,
-                isPrivate: this.newRoomType == 'private',
-                isSocialized: this.newRoomType == 'social'
-            });
-            if(result.success){
-                this.$router.push({name:'channel',params:{name: result.channel}});
-            }else{
-                console.error(error);
-                const notif = new Notification('Failed', {
-                    body: result.error_message
-                });
-            }
-        },
-        search:function(e){
-            e.preventDefault();
-            this.$router.push({name:'search',params:{q:this.searchQuery}});
-            return false;
-        },
-        invitePerson: async function(){
-            if(this.newInvite.name.length && this.newInvite.phone.length){
-                const result = await ClubHouseApi.api.inviteToApp(this.reqProfile,this.newInvite.name,this.newInvite.phone);
-                console.log(result);
-                if(result.success){
-                    this.$toastr.Add({
-                        name: `invited`,
-                        msg: `${this.newInvite.phone} Invited`,
-                        title: this.newInvite.name,
-                        type:'info',
-                        timeout:4000,
-                        position: "toast-bottom-right",
-                        style:{backgroundImage:'none !important'}
-                    });
-                    this.getMe();
-                }else{
-                    console.error(result);
-                    new Notification('Failed',{
-                        body: result.error_message || ''
-                    });
-                }
-            }
-        },
-        switchTheme: function(){
-            if(this.theme == 'light'){
-                localStorage.setItem('theme','dark');
-                window.theme = 'dark';
-                this.theme = 'dark';
-                document.body.classList.remove('light');
-                document.body.classList.add('dark');
-            }else{
-                localStorage.setItem('theme','light');
-                window.theme = 'light';
-                this.theme = 'light';
-                document.body.classList.remove('dark');
-                document.body.classList.add('light');
-            }
-        }
-    },
-    template: `
+			clearInterval(this.onlineFriendsInterval);
+			this.onlineFriendsInterval = setInterval(function() {
+				$this.getOnlineFriends();
+			}, 10000);
+		},
+		getMe: async function() {
+			this.loading = true;
+			if (this.userData && this.userData.user_profile) {
+				const result = await ClubHouseApi.api.getProfile(this.reqProfile);
+				console.log(result);
+				if (result.success) {
+					this.myProfile = result;
+					this.loading = false;
+				} else {
+					console.error(result);
+				}
+			}
+		},
+		getEvents: async function() {
+			if (this.userData && this.userData.user_profile) {
+				const result = await ClubHouseApi.api.getEvents(this.reqProfile, true);
+				console.log(result);
+				if (result.success) {
+					this.eventsResult = result;
+					this.events = result.events;
+					this.eventsLoading = false;
+				} else {
+					console.error(result);
+					new Notification("Invalid Token", {
+						body:
+							"Your token is invalid. Try again and if you see this error again, Logout and Log in back"
+					});
+					// store.remove('userData');
+					// this.$router.replace({name:'login'});
+				}
+			}
+		},
+		getChannels: async function() {
+			const $this = this;
+			if (this.userData && this.userData.user_profile) {
+				const result = await ClubHouseApi.api.getChannels(this.reqProfile);
+				console.log(result);
+				if (result.success) {
+					this.channelsResult = result;
+					this.channels = result.channels.filter(channel =>
+						store.get("settings").filterEastern
+							? isLatinString(channel.topic)
+							: true
+					);
+					this.channelsLoading = false;
+					if (this.channelsInterval) {
+						clearInterval(this.channelsInterval);
+					}
+					this.channelsInterval = setInterval(function() {
+						$this.getChannels();
+					}, 30000);
+				} else {
+					console.error(result);
+					if (this.events.length) {
+						this.getChannels();
+					} else {
+						if (this.retry < 2) {
+							this.getChannels();
+							this.retry++;
+						} else {
+							new Notification("Invalid Token", {
+								body:
+									"Your token is invalid. Try again and if you see this error again, Logout and Log in back"
+							});
+							// store.remove('userData');
+							// this.$router.replace({name:'login'});
+						}
+					}
+				}
+			}
+		},
+		logout: function() {
+			store.remove("userData");
+			this.$router.replace("/");
+		},
+		createChannel: async function() {
+			const result = await ClubHouseApi.api.createChannel(this.reqProfile, {
+				topic: this.newRoom.topic || "",
+				guests: this.newRoomFriends,
+				isPrivate: this.newRoomType == "private",
+				isSocialized: this.newRoomType == "social"
+			});
+			if (result.success) {
+				this.$router.push({
+					name: "channel",
+					params: { name: result.channel }
+				});
+			} else {
+				console.error(error);
+				const notif = new Notification("Failed", {
+					body: result.error_message
+				});
+			}
+		},
+		search: function(e) {
+			e.preventDefault();
+			this.$router.push({ name: "search", params: { q: this.searchQuery } });
+			return false;
+		},
+		invitePerson: async function() {
+			if (this.newInvite.name.length && this.newInvite.phone.length) {
+				const result = await ClubHouseApi.api.inviteToApp(
+					this.reqProfile,
+					this.newInvite.name,
+					this.newInvite.phone
+				);
+				console.log(result);
+				if (result.success) {
+					this.$toastr.Add({
+						name: `invited`,
+						msg: `${this.newInvite.phone} Invited`,
+						title: this.newInvite.name,
+						type: "info",
+						timeout: 4000,
+						position: "toast-bottom-right",
+						style: { backgroundImage: "none !important" }
+					});
+					this.getMe();
+				} else {
+					console.error(result);
+					new Notification("Failed", {
+						body: result.error_message || ""
+					});
+				}
+			}
+		},
+		switchTheme: function() {
+			if (this.theme == "light") {
+				localStorage.setItem("theme", "dark");
+				window.theme = "dark";
+				this.theme = "dark";
+				document.body.classList.remove("light");
+				document.body.classList.add("dark");
+			} else {
+				localStorage.setItem("theme", "light");
+				window.theme = "light";
+				this.theme = "light";
+				document.body.classList.remove("dark");
+				document.body.classList.add("light");
+			}
+		}
+	},
+	template: `
         <div class="p-5 home">
         <div class="loading" v-if="loading"><div></div><div></div><div></div><div></div></div>
         <div v-if="!loading">
