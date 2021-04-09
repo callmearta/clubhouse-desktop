@@ -16,3 +16,12 @@ Also i'm using a really old version of Agora web SDK and that's because new vers
 # Screenshot
 
 ![Screenshot](https://github.com/callmearta/clubhouse-desktop/blob/main/Screen%20Shot%202021-03-14%20at%2018.01.56.png?raw=true)
+
+
+# How to run source code locally
+1. Clone the project
+2. Go to root folder of project and run `npm install`
+3. Run `npm start` to run the project
+
+# How to build source code
+I've used electron-packager myself for bundling the app and building releases. You can do so using electron-packager too. I hope you do not build versions with minor changes and credit yourself for it!
