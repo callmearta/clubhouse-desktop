@@ -52,6 +52,14 @@ const User = {
 			console.log(result);
 			if (result.success) {
 				this.user = result;
+                if (userData.followingIds === undefined) {
+                    userData.followingIds = await this.getFollowings();
+                    store.set('userData', userData);
+                }
+                this.$set(
+                        this.user.user_profile,
+                        'my_following',
+                        userData.followingIds.findIndex(id => id == this.id) > -1);
 				this.loading = false;
 			} else {
 				console.error(result);
@@ -108,6 +116,27 @@ const User = {
 				});
 			}
 		},
+        getFollowings:async function(){
+            const userData = store.get('userData');
+            const profile = {
+                ...ClubHouseApi.profiles.application.a304,
+                ...ClubHouseApi.profiles.locales.English,
+                userId: userData.user_profile.user_id,
+                token: userData.auth_token
+            };
+            const result = await ClubHouseApi.api.getFollowing(
+                    profile,
+                    Number(userData.user_profile.user_id));
+            if (result.success) {
+                var followingUserIds = [];
+                result.users.forEach((user) => followingUserIds.push(user.user_id));
+                return followingUserIds;
+            } else{
+                new Notification('Failed',{
+                    body: 'Failed'
+                });
+            }
+        },
 		follow: async function() {
 			const userData = store.get("userData");
 			const profile = {
@@ -123,11 +152,18 @@ const User = {
 			);
 			console.log(result);
 			if (result.success) {
-				this.$set(this.profile, "following_ids", [
-					...this.profile.following_ids,
-					Number(this.id)
-				]);
-				console.log(this.profile.following_ids);
+                if (userData.followingIds === undefined) {
+                    userData.followingIds = await this.getFollowings();
+                }
+                userData.followingIds.push(this.id);
+                store.set('userData', userData);
+                this.$set(
+                        this.user,
+                        'user_profile',
+                        {
+                            ...this.user.user_profile,
+                            notification_type:2,
+                            my_following: true});
 			} else {
 				console.error(result);
 			}
@@ -146,13 +182,22 @@ const User = {
 			);
 			console.log(result);
 			if (result.success) {
-				const index = this.profile.following_ids.indexOf(Number(this.id));
-				if (index > -1) {
-					let newFollowingIds = this.profile.following_ids;
-					newFollowingIds.splice(index, 1);
-					this.$set(this.profile, "following_ids", newFollowingIds);
+                if (userData.followingIds === undefined) {
+                    userData.followingIds = await this.getFollowings();
+                }
+                var filteredIds = userData.followingIds.filter(
+                        (value, index) => value !== this.id);
+                userData.followingIds = filteredIds;
+                store.set('userData', userData);
+                this.$set(
+                        this.user,
+                        'user_profile',
+                        {
+                            ...this.user.user_profile,
+                            notification_type:null,
+                            my_following: false});
 				}
-			} else {
+			else {
 				console.error(result);
 			}
 		},
@@ -369,8 +414,8 @@ const User = {
                     <h1 class="h5 mb-0 mt-3">{{user.user_profile.name}}<i class="far fa-pencil ml-2 cursor-pointer" @click="editName.modalVisible = true" v-if="isMe && user.user_profile.can_edit_name"></i></h1>
                     <small class="text-muted">@{{user.user_profile.username}}<i class="far fa-pencil ml-2 cursor-pointer" @click="editUsername.modalVisible = true" v-if="isMe && user.user_profile.can_edit_username"></i></small>
                     <small class="text-muted">Joined At: {{new Date(user.user_profile.time_created).toDateString()}}</small>
-                    <button class="btn-primary mt-3" @click="follow" v-if="!isMe && profile.following_ids.indexOf(user.user_profile.user_id) <= -1">Follow</button>
-                    <button class="btn-primary mt-3" @click="unfollow" v-if="!isMe && profile.following_ids.indexOf(user.user_profile.user_id) > -1">Unfollow</button>
+                    <button class="btn-primary mt-3" @click="follow" v-if="!isMe && !user.user_profile.my_following">Follow</button>
+                    <button class="btn-primary mt-3" @click="unfollow" v-if="!isMe && user.user_profile.my_following">Unfollow</button>
                     <small class="text-muted mt-2" v-if="user.user_profile.mutual_follows.length">Followed By {{user.user_profile.mutual_follows.reduce((p1,p2) => [...p1,p2.name],[]).join(', ')}}</small>
                     <div class="d-flex align-items-center justify-content-center mt-3">
                         <router-link :to="{name:'userlist',params:{id:user.user_profile.user_id,type:'followers'}}" class="mr-3 cursor-pointer color-dark">{{user.user_profile.num_followers}} Followers</router-link>
