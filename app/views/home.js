@@ -1,6 +1,10 @@
 const ClubHouseApi = require("clubhouse-api");
 const store = require("store");
 
+const THEME_AUTO = "auto";
+const THEME_LIGHT = "light";
+const THEME_DARK = "dark";
+
 function isLatinString(s) {
 	if (s) {
 		if (
@@ -83,7 +87,7 @@ const Home = {
 			onlineFriendsInterval: null,
 			newRoomFriends: [],
 			newRoomType: null,
-			theme: window.theme,
+			theme: window.theme || THEME_AUTO,
 			roomsKeyword: ""
 		};
 	},
@@ -231,11 +235,18 @@ const Home = {
 			}
 		},
 		switchTheme: function(e) {
-			let newTheme = this.theme == "light" ? "dark" : "light";
-			localStorage.setItem("theme", newTheme);
+			const themes = [THEME_AUTO, THEME_LIGHT, THEME_DARK];
+			const nextIndex = (themes.indexOf(this.theme) + 1) % themes.length;
+			const newTheme = themes[(themes.indexOf(this.theme) + 1) % themes.length];
+
 			window.theme = newTheme;
 			this.theme = newTheme;
-			document.body.setAttribute("data-theme", newTheme);
+			localStorage.setItem("theme", newTheme);
+
+			const systemTheme = matchMedia(`(prefers-color-scheme: ${THEME_LIGHT})`)
+				.matches ? THEME_LIGHT : THEME_DARK;
+			document.body.setAttribute("data-theme",
+				newTheme === 'auto' ? systemTheme : newTheme);
 		}
 	},
 	template: `
@@ -348,6 +359,7 @@ const Home = {
                         <i class="far fa-search" @click="search"></i>
                     </form>
                     <span class="mr-4 btn-light cursor-pointer" @click="switchTheme">
+                        <i class="fa fa-adjust" v-if="theme === 'auto'"></i>
                         <i class="far fa-moon" v-if="theme == 'dark'"></i>
                         <i class="fas fa-sun" v-if="theme == 'light'"></i>
                     </span>
