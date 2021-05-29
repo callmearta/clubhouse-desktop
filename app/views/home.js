@@ -230,20 +230,12 @@ const Home = {
 				}
 			}
 		},
-		switchTheme: function() {
-			if (this.theme == "light") {
-				localStorage.setItem("theme", "dark");
-				window.theme = "dark";
-				this.theme = "dark";
-				document.body.classList.remove("light");
-				document.body.classList.add("dark");
-			} else {
-				localStorage.setItem("theme", "light");
-				window.theme = "light";
-				this.theme = "light";
-				document.body.classList.remove("dark");
-				document.body.classList.add("light");
-			}
+		switchTheme: function(e) {
+			let newTheme = this.theme == "light" ? "dark" : "light";
+			localStorage.setItem("theme", newTheme);
+			window.theme = newTheme;
+			this.theme = newTheme;
+			document.body.setAttribute("data-theme", newTheme);
 		}
 	},
 	template: `

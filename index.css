@@ -748,50 +748,48 @@ input {
 	color: var(--text-color);
 }
 
-@media (prefers-color-scheme: dark) {
-	body.dark {
-		--bg-color: rgb(31, 41, 55);
-		--cream-color: rgb(57, 71, 90);
-		--text-color: rgb(202, 202, 202);
-		--white-color: rgb(49, 58, 70);
-		--primary-color: rgb(41, 39, 56);
-		--primary-color-hover: rgb(53, 51, 68);
-		--primary-color-opacity: rgba(65, 62, 83, 0.75);
-	}
-	body.dark a:hover {
-		color: rgba(255, 255, 255, 0.5);
-	}
-	body.dark .form-control,
-	body.dark .form-control:focus,
-	body.dark .form-control:focus {
-		background: rgba(255, 255, 255, 0.1) !important;
-		color: var(--text-color) !important;
-	}
-	body.dark .search-input {
-		background: rgba(255, 255, 255, 0.05);
-	}
-	body.dark .border-bottom {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-	}
-	body.dark .border-top {
-		border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-	}
-	body.dark .btn-grey {
-		color: var(--text-color);
-	}
-	body.dark .btn-light:hover,
-	body.dark .btn-grey:hover {
-		background: var(--primary-color-hover) !important;
-	}
-	body.dark .user.isSpeaking .user-img {
-		border: 5px solid rgb(177, 165, 221);
-	}
-	body.dark .custom-radio label {
-		border: 1px solid rgba(255, 255, 255, 0.2);
-	}
-	body.dark .custom-radio input:checked + label {
-		background: rgba(0, 0, 0, 0.2);
-	}
+[data-theme="dark"] {
+	--bg-color: rgb(31, 41, 55);
+	--cream-color: rgb(57, 71, 90);
+	--text-color: rgb(202, 202, 202);
+	--white-color: rgb(49, 58, 70);
+	--primary-color: rgb(41, 39, 56);
+	--primary-color-hover: rgb(53, 51, 68);
+	--primary-color-opacity: rgba(65, 62, 83, 0.75);
+}
+[data-theme="dark"] a:hover {
+	color: rgba(255, 255, 255, 0.5);
+}
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-control:focus {
+	background: rgba(255, 255, 255, 0.1) !important;
+	color: var(--text-color) !important;
+}
+[data-theme="dark"] .search-input {
+	background: rgba(255, 255, 255, 0.05);
+}
+[data-theme="dark"] .border-bottom {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+[data-theme="dark"] .border-top {
+	border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+[data-theme="dark"] .btn-grey {
+	color: var(--text-color);
+}
+[data-theme="dark"] .btn-light:hover,
+[data-theme="dark"] .btn-grey:hover {
+	background: var(--primary-color-hover) !important;
+}
+[data-theme="dark"] .user.isSpeaking .user-img {
+	border: 5px solid rgb(177, 165, 221);
+}
+[data-theme="dark"] .custom-radio label {
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .custom-radio input:checked + label {
+	background: rgba(0, 0, 0, 0.2);
 }
 
 a i {
