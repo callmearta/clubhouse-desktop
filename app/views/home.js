@@ -235,7 +235,12 @@ const Home = {
 			}
 		},
 		switchTheme: function(e) {
-			const themes = [THEME_AUTO, THEME_LIGHT, THEME_DARK];
+			const systemTheme = matchMedia(`(prefers-color-scheme: ${THEME_LIGHT})`)
+				.matches ? THEME_LIGHT : THEME_DARK;
+			// Order of the themes depends on current system theme.
+			// This will help user to see the opposite theme first.
+			// This way, user won't feel button didn't make any change.
+			const themes = [THEME_AUTO, systemTheme === THEME_LIGHT ? THEME_DARK : THEME_LIGHT, systemTheme === THEME_LIGHT ? THEME_LIGHT : THEME_DARK];
 			const nextIndex = (themes.indexOf(this.theme) + 1) % themes.length;
 			const newTheme = themes[(themes.indexOf(this.theme) + 1) % themes.length];
 
@@ -243,8 +248,6 @@ const Home = {
 			this.theme = newTheme;
 			localStorage.setItem("theme", newTheme);
 
-			const systemTheme = matchMedia(`(prefers-color-scheme: ${THEME_LIGHT})`)
-				.matches ? THEME_LIGHT : THEME_DARK;
 			document.body.setAttribute("data-theme",
 				newTheme === 'auto' ? systemTheme : newTheme);
 		}
