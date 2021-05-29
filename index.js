@@ -41,7 +41,7 @@ const createMainWindow = async () => {
 		minHeight: 800,
 		titleBarStyle: "hidden",
 		fullscreenable: true,
-		fullscreen: true,
+		fullscreen: false,
 		frame: os.platform() == "linux" ? false : true,
 		icon: path.join(__dirname, "static/logo.png"),
 		webPreferences: {
