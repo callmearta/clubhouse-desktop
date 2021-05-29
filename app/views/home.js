@@ -240,7 +240,11 @@ const Home = {
 			// Order of the themes depends on current system theme.
 			// This will help user to see the opposite theme first.
 			// This way, user won't feel button didn't make any change.
-			const themes = [THEME_AUTO, systemTheme === THEME_LIGHT ? THEME_DARK : THEME_LIGHT, systemTheme === THEME_LIGHT ? THEME_LIGHT : THEME_DARK];
+			const themes = [
+				THEME_AUTO,
+				systemTheme === THEME_LIGHT ? THEME_DARK : THEME_LIGHT,
+				systemTheme === THEME_LIGHT ? THEME_LIGHT : THEME_DARK
+			];
 			const nextIndex = (themes.indexOf(this.theme) + 1) % themes.length;
 			const newTheme = themes[(themes.indexOf(this.theme) + 1) % themes.length];
 
@@ -415,7 +419,7 @@ const Home = {
                     </router-link>
                 </div>
             </div>
-            
+
             <div class="d-flex align-items-center justify-content-start mt-4 mb-2">
                 <h5>Rooms</h5>
                 <div class="search-input ml-3">

@@ -17,7 +17,7 @@
 			const THEME_LIGHT = "light";
 			const THEME_DARK = "dark";
 
-			const setTheme = (theme, save) => {
+			const setTheme = (theme) => {
 				window.theme = theme;
 				const systemTheme = matchMedia(`(prefers-color-scheme: ${THEME_LIGHT})`).matches ? THEME_LIGHT : THEME_DARK;
 
