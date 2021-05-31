@@ -13,6 +13,7 @@ const { is } = require("electron-util");
 const unhandled = require("electron-unhandled");
 const debug = require("electron-debug");
 const contextMenu = require("electron-context-menu");
+const config = require('./config');
 const menu = require("./menu");
 
 if (os.platform() == "darwin") {
@@ -32,16 +33,17 @@ app.commandLine.appendSwitch("ignore-certificate-errors");
 let mainWindow;
 
 const createMainWindow = async () => {
+	const ws = config.get('windowstate', {});
 	const win = new BrowserWindow({
 		title: "Clubhouse Desktop Client",
 		show: false,
-		width: 1020,
-		height: 800,
+		width: ws.width || 1020,
+		height: ws.height || 800,
 		minWidth: 1360,
 		minHeight: 800,
 		titleBarStyle: "hidden",
 		fullscreenable: true,
-		fullscreen: true,
+		isMaximized: ws.isMaximized,
 		frame: os.platform() == "linux" ? false : true,
 		icon: path.join(__dirname, "static/logo.png"),
 		webPreferences: {
@@ -70,6 +72,17 @@ const createMainWindow = async () => {
 		// Dereference the window
 		// For multiple windows store them in an array
 		mainWindow = undefined;
+	});
+
+	win.on("close", () => {
+		const isMaximized = win.isMaximized();
+		const bounds = win.getBounds();
+		
+		config.set('windowstate', {
+			height: bounds.height,
+			width: bounds.width,
+			isMaximized: isMaximized
+		});
 	});
 
 	await win.loadFile(path.join(__dirname, "index.html"));
