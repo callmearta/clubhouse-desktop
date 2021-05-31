@@ -13,15 +13,31 @@
 		<script src="app/a.js"></script>
 		<script src="app/main.js" type="module"></script>
 		<script type="text/javascript">
-			let theme = localStorage.getItem("theme");
-			if (!theme) {
-				theme = "light";
-				localStorage.setItem("theme", "light");
+			const THEME_AUTO = "auto";
+			const THEME_LIGHT = "light";
+			const THEME_DARK = "dark";
+
+			const setTheme = (theme) => {
+				window.theme = theme;
+				const systemTheme = matchMedia(`(prefers-color-scheme: ${THEME_LIGHT})`).matches ? THEME_LIGHT : THEME_DARK;
+
+				document.body.setAttribute("data-theme", theme === THEME_AUTO ? systemTheme : theme);
+			};
+
+			matchMedia(`(prefers-color-scheme: ${THEME_DARK})`)
+				.addListener((e) => {
+					let storedTheme = localStorage.getItem("theme");
+					if (storedTheme === THEME_AUTO) {
+						setTheme(e.matches ? THEME_DARK : THEME_LIGHT);
+					}
+				});
+
+			let storedTheme = localStorage.getItem("theme");
+			if (!storedTheme) {
+				storedTheme = THEME_AUTO;
+				localStorage.setItem("theme", THEME_AUTO);
 			}
-			window.theme = theme;
-			if (!document.body.classList.contains(theme)) {
-				document.body.classList.add(theme);
-			}
+			setTheme(storedTheme);
 		</script>
 	</body>
 </html>
