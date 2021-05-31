@@ -448,6 +448,7 @@ const Channel = {
 								await navigator.mediaDevices.enumerateDevices()
 							).filter(i => i.kind == "audioinput")[0].deviceId
 						});
+						stream.setAudioProfile('high_quality_stereo');
 						stream.init(() => {
 							if (client) {
 								stream.enableAudio();
