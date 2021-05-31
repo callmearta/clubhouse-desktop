@@ -1,3 +1,5 @@
+# This application may not be resold or republished under someone else's name and credits may not be removed from the application. 
+
 # clubhouse-desktop
 
 This is an unofficial desktop client for the currently trending ClubHouse.
