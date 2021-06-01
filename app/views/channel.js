@@ -1032,6 +1032,9 @@ const Channel = {
                 <div class="d-flex align-items-center justify-content-between px-4 pt-4">
                     <h1 class="h4 overflow-ellipsis">{{channel.topic}}</h1>
                     <div class="d-flex align-items-center justify-content-end">
+						<button class="btn-light mr-3" @click="$router.replace('/')">
+						    <i class="far fa-home cursor-pointer" ></i>
+						</button>
                         <button class="btn-light mr-3" @click="handRaise" v-if="!isSpeaker && channel.handraise_permission">
                             <img :src="this.handRaised ? 'assets/images/fist.png' : 'assets/images/handraise.png'" height="18" />
                         </button>
