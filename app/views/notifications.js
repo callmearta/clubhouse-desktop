@@ -14,6 +14,7 @@ const Notifications = {
     methods:{
         getNotifications: async function(){
             const userData = store.get('userData');
+            console.log(userData);
             const profiles = {
                 ...ClubHouseApi.profiles.application.a304,
                 ...ClubHouseApi.profiles.locales.English,
@@ -42,7 +43,7 @@ const Notifications = {
                         <span class="text-muted cursor-pointer" @click="$router.go(-1)">Go Back</span>
                     </div>
                     <strong class="d-block text-center border-bottom pb-3 mb-3">Notifications</strong>
-                    <router-link :to="{name:'user',params:{id:notif.user_profile.user_id}}" class="user-h" v-for="notif in notifications">
+                    <router-link :to="{name:'user',params:{id:notif.user_profile.user_id}}" class="user-h" v-if="notif.user_profile" v-for="notif in notifications">
                         <div class="user-img">
                             <img :src="notif.user_profile.photo_url" />
                         </div>
