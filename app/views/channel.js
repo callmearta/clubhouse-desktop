@@ -100,6 +100,19 @@ const Channel = {
 		}
 	},
 	methods: {
+		_updateUserFields: function (user_id, update_fields) {
+			const userIndex = this.users.findIndex(
+				u => u.user_id == user_id
+			);
+			if (userIndex > -1) {
+				this.$set(this.users, userIndex, {
+					...this.users[userIndex],
+					...update_fields
+				});
+				return true;
+			}
+			return false;
+		},
 		activePing: async function() {
 			const userData = store.get("userData");
 			const profiles = {
@@ -533,29 +546,15 @@ const Channel = {
 				);
 			});
 			client.on("mute-audio", function(evt) {
-				const userIndex = $this.users?.findIndex(
-					i => i && i.user_id == evt.uid
-				);
-				if (userIndex > -1) {
-					let newUsers = [...$this.users];
-					$this.$set($this.users, userIndex, {
-						...newUsers[userIndex],
-						speaking: false,
-						unmute: false
-					});
-				}
+				$this._updateUserFields(evt.uid, {
+					speaking: false,
+					unmute: false
+				});
 			});
 			client.on("unmute-audio", function(evt) {
-				const userIndex = $this.users?.findIndex(
-					i => i && i.user_id == evt.uid
-				);
-				if (userIndex > -1) {
-					let newUsers = [...$this.users];
-					$this.$set($this.users, userIndex, {
-						...newUsers[userIndex],
-						unmute: true
-					});
-				}
+				$this._updateUserFields(evt.uid, {
+					unmute: true
+				});
 			});
 		},
 		subscribeStream: function(evt) {
@@ -602,30 +601,18 @@ const Channel = {
 				stream.disableAudio();
 				stream.muteAudio();
 			}
-			const userIndex = this.users.findIndex(
-				u => u.user_id == this.userData.user_profile.user_id
-			);
-			if (userIndex > -1) {
-				this.$set(this.users, userIndex, {
-					...this.users[userIndex],
-					unmute: false
-				});
-			}
+			this._updateUserFields(this.userData.user_profile.user_id, {
+			    unmute: false
+			});
 		},
 		unmute: function() {
 			if (stream) {
 				stream.enableAudio();
 				stream.unmuteAudio();
 			}
-			const userIndex = this.users.findIndex(
-				u => u.user_id == this.userData.user_profile.user_id
-			);
-			if (userIndex > -1) {
-				this.$set(this.users, userIndex, {
-					...this.users[userIndex],
-					unmute: true
-				});
-			}
+			this._updateUserFields(this.userData.user_profile.user_id, {
+			    unmute: true
+			});
 		},
 		inviteSpeaker: async function(userId) {
 			const profile = {
