@@ -101,7 +101,7 @@ const Channel = {
 	},
 	methods: {
 		_updateUserFields: function (user_id, update_fields) {
-			const userIndex = this.users.findIndex(
+			const userIndex = this.users?.findIndex(
 				u => u.user_id == user_id
 			);
 			if (userIndex > -1) {
@@ -321,11 +321,7 @@ const Channel = {
 		},
 		makeModerator: function(msg) {
 			const userData = store.get("userData");
-			const userIndex = this.users.findIndex(
-				u => u && u.user_id == msg.user_id
-			);
-			this.$set(this.users, userIndex, {
-				...this.users[userIndex],
+			this._updateUserFields(msg.user_id, {
 				is_moderator: true
 			});
 			if (msg.user_id == userData.user_profile.user_id) {
@@ -481,30 +477,18 @@ const Channel = {
 				$this.subscribeStream(evt);
 			});
 			client.on("active-speaker", function(evt) {
-				const userIndex = $this.users.findIndex(i => i && i.user_id == evt.uid);
-
-				if (userIndex > -1) {
-					let newUsers = [...$this.users];
-					$this.$set($this.users, userIndex, {
-						...newUsers[userIndex],
-						speaking: true,
-						unmute: true
-					});
-				}
+				$this._updateUserFields(evt.uid, {
+					speaking: true,
+					unmute: true
+				});
 			});
 			client.on("volume-indicator", function(evt) {
 				evt.attr.forEach(u => {
-					const userIndex = $this.users.findIndex(i => i && i.user_id == u.uid);
-
-					if (userIndex > -1) {
-						let newUsers = [...$this.users];
-						$this.$set($this.users, userIndex, {
-							...newUsers[userIndex],
-							speaking: true,
-							unmute: true,
-							volumeLevel: u.level
-						});
-					}
+					$this._updateUserFields(u.uid, {
+						speaking: true,
+						unmute: true,
+						volumeLevel: u.level
+					});
 				});
 			});
 			client.on("stream-subscribed", function(evt) {
@@ -527,17 +511,9 @@ const Channel = {
 			});
 			client.on("stream-removed", function(evt) {
 				let stream = evt.stream;
-				const userIndex = $this.users?.findIndex(
-					i => i && i.user_id == stream.getId()
-				);
-
-				if (userIndex > -1) {
-					let newUsers = [...$this.users];
-					$this.$set($this.users, userIndex, {
-						...newUsers[userIndex],
-						speaking: false
-					});
-				}
+				$this._updateUserFields(stream.getId(), {
+					speaking: false
+				});
 
 				// stream.stop();
 				$this.streams.splice(
@@ -566,17 +542,10 @@ const Channel = {
 				});
 			}
 
-			const userIndex = this.users.findIndex(
-				i => i && i.user_id == evt.stream.getId()
-			);
-			if (userIndex > -1 && !this.users[userIndex].speaking) {
-				let newUsers = [...this.users];
-				this.$set(this.users, userIndex, {
-					...newUsers[userIndex],
-					speaking: true,
-					unmute: true
-				});
-			}
+			this._updateUserFields(evt.stream.getId(), {
+				speaking: true,
+				unmute: true
+			});
 		},
 		leave: async function() {
 			const userData = store.get("userData");
@@ -602,7 +571,7 @@ const Channel = {
 				stream.muteAudio();
 			}
 			this._updateUserFields(this.userData.user_profile.user_id, {
-			    unmute: false
+				unmute: false
 			});
 		},
 		unmute: function() {
@@ -611,7 +580,7 @@ const Channel = {
 				stream.unmuteAudio();
 			}
 			this._updateUserFields(this.userData.user_profile.user_id, {
-			    unmute: true
+				unmute: true
 			});
 		},
 		inviteSpeaker: async function(userId) {
