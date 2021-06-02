@@ -51,6 +51,7 @@ const Channel = {
 			users: [],
 			loading: true,
 			isSpeaker: false,
+			isMuted: true,
 			userData: store.get("userData"),
 			handRaised: false,
 			activePingInterval: null,
@@ -154,13 +155,8 @@ const Channel = {
 				const me = result.users.find(
 					user => user.user_id == userData.user_profile.user_id
 				);
-				if (me.is_moderator) {
-					this.isModerator = true;
-					this.isSpeaker = true;
-				}
-				if (me.is_speaker) {
-					this.isSpeaker = true;
-				}
+				this.isModerator = me.is_moderator;
+				this.isSpeaker = me.is_moderator || me.is_speaker;
 
 				// if(client){
 				//     client.leave();
@@ -305,15 +301,14 @@ const Channel = {
 		},
 		removeSpeaker: function(userId) {
 			const userData = store.get("userData");
-			const userIndex = this.users.findIndex(u => u && u.user_id == userId);
-			this.$set(this.users, userIndex, {
-				...this.users[userIndex],
+			this._updateUserFields(userId, {
 				is_speaker: false,
 				is_moderator: false
 			});
 			if (userId == userData.user_profile.user_id) {
 				this.isSpeaker = false;
 				this.isModerator = false;
+				this.isMuted = true;
 				pubnub.unsubscribe({
 					channels: [`channel_speakers.${this.channel.channel}`]
 				});
@@ -471,6 +466,7 @@ const Channel = {
 				if (client) {
 					evt.stream.enableAudio();
 					evt.stream.muteAudio();
+					this.isMuted = true;
 				}
 			});
 			client.on("stream-added", async function(evt) {
@@ -569,6 +565,7 @@ const Channel = {
 			if (stream) {
 				stream.disableAudio();
 				stream.muteAudio();
+				this.isMuted = true;
 			}
 			this._updateUserFields(this.userData.user_profile.user_id, {
 				unmute: false
@@ -578,6 +575,7 @@ const Channel = {
 			if (stream) {
 				stream.enableAudio();
 				stream.unmuteAudio();
+				this.isMuted = false;
 			}
 			this._updateUserFields(this.userData.user_profile.user_id, {
 				unmute: true
@@ -994,10 +992,10 @@ const Channel = {
                         <button class="btn-light mr-3" @click="getChannel">
                             <i class="far fa-sync"></i>
                         </button>
-                        <button class="btn-grey mr-3" @click="unmute" v-if="isSpeaker && users.find(user => user.user_id == userData.user_profile.user_id) && !users.find(user => user.user_id == userData.user_profile.user_id).unmute">
+                        <button class="btn-grey mr-3" @click="unmute" v-if="isMuted">
                             <i class="far fa-microphone-slash"></i>
                         </button>
-                        <button class="btn-light mr-3" @click="mute" v-if="isSpeaker && users.find(user => user.user_id == userData.user_profile.user_id) && users.find(user => user.user_id == userData.user_profile.user_id).unmute">
+                        <button class="btn-light mr-3" @click="mute" v-if="!isMuted">
                             <i class="far fa-microphone"></i>
                         </button>
                         <button @click="leave" class="btn-primary">Leave Room</button>
