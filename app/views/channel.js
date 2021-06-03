@@ -157,6 +157,9 @@ const Channel = {
 				);
 				this.isModerator = me.is_moderator;
 				this.isSpeaker = me.is_moderator || me.is_speaker;
+				this._updateUserFields(this.userData.user_profile.user_id, {
+					unmute: !this.isMuted
+				});
 
 				// if(client){
 				//     client.leave();
