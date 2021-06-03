@@ -415,7 +415,7 @@ const User = {
                     <pre class="mt-2 pt-3 w-100">{{user.user_profile.bio}}</pre>
                     <div class="settings mt-2 pt-3 border-top w-100" v-if="isMe">
                         <section>
-                            <label>Hide Japanese/Chienese Rooms:</label>
+                            <label>Hide Japanese/Chinese Rooms:</label>
                             <div class="row">
                                 <div class="col-6 input-group custom-radio">
                                     <input type="radio" name="filterEastern" @change="changeFilterEastern" value="1" v-model="filterEastern"/>
