@@ -389,11 +389,11 @@ const User = {
                         </router-link>
                     </div>
                     <div class="d-flex align-items-center justify-content-start border-top mt-2 pt-3 w-100">
-                        <a :href="'https://instagram.com/' + user.user_profile.instagram" title="" target="_blank" class="text-dark mr-3" v-if="user.user_profile.instagram">
+                        <a :href="'https://instagram.com/' + user.user_profile.instagram" title="" target="_blank" class="text-primary mr-3" v-if="user.user_profile.instagram">
                             <i class="fab fa-instagram"></i>
                             <span>{{user.user_profile.instagram}}</span>
                         </a>
-                        <a :href="'https://twitter.com/' + user.user_profile.twitter" title="" target="_blank" class="text-dark" v-if="user.user_profile.twitter">
+                        <a :href="'https://twitter.com/' + user.user_profile.twitter" title="" target="_blank" class="text-primary" v-if="user.user_profile.twitter">
                             <i class="fab fa-twitter"></i>
                             <span>{{user.user_profile.twitter}}</span>
                         </a>
