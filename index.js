@@ -15,7 +15,6 @@ const debug = require("electron-debug");
 const contextMenu = require("electron-context-menu");
 const config = require('./config');
 const menu = require("./menu");
-const { writevSync } = require("fs");
 
 if (os.platform() == "darwin") {
 	systemPreferences.askForMediaAccess("microphone").then(isAllowed => {
@@ -48,7 +47,7 @@ const createMainWindow = async () => {
 		isMaximized: ws.isMaximized,
 		frame: true,
 		resizable: true,
-		icon: path.join(__dirname, "static/logo.png"),
+		icon: path.join(__dirname, "static/icon.png"),
 		webPreferences: {
 			nodeIntegration: true,
 			nodeIntegrationInSubFrames: true,
