@@ -15,6 +15,7 @@ const debug = require("electron-debug");
 const contextMenu = require("electron-context-menu");
 const config = require('./config');
 const menu = require("./menu");
+const { writevSync } = require("fs");
 
 if (os.platform() == "darwin") {
 	systemPreferences.askForMediaAccess("microphone").then(isAllowed => {
@@ -39,12 +40,14 @@ const createMainWindow = async () => {
 		show: false,
 		width: ws.width || 1020,
 		height: ws.height || 800,
-		minWidth: 1360,
-		minHeight: 800,
-		titleBarStyle: "hidden",
-		fullscreenable: true,
+		minWidth: 965,
+		minHeight: 500,
+		autoHideMenuBar: true, // Hides menubar on Top
+		// titleBarStyle: "hidden",
+		fullscreenable: false,
 		isMaximized: ws.isMaximized,
-		frame: os.platform() == "linux" ? false : true,
+		frame: true,
+		resizable: true,
 		icon: path.join(__dirname, "static/logo.png"),
 		webPreferences: {
 			nodeIntegration: true,
