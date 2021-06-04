@@ -42,10 +42,10 @@ const createMainWindow = async () => {
 		minWidth: 965,
 		minHeight: 500,
 		autoHideMenuBar: true, // Hides menubar on Top
-		// titleBarStyle: "hidden",
+		titleBarStyle: os.platform() == "darwin" ? "hidden" : '',
 		fullscreenable: false,
 		isMaximized: ws.isMaximized,
-		frame: true,
+        frame: os.platform() == "darwin" ? false : true,
 		resizable: true,
 		icon: path.join(__dirname, "static/icon.png"),
 		webPreferences: {
