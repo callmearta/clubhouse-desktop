@@ -4,7 +4,6 @@ const Vue = require("vue/dist/vue.js");
 const VueToaster = require("vue-toastr");
 const store = require("store");
 const ClubHouseApi = require("clubhouse-api");
-const ua = require("universal-analytics");
 
 import Login from "./views/login.js";
 import Home from "./views/home.js";
@@ -125,16 +124,6 @@ const app = new Vue({
 			});
 		}
 		const userData = store.get("userData");
-		if (userData && userData.user_profile.user_id) {
-			var visitor = ua("UA-191723723-1", "" + userData.user_profile.user_id, {
-				uid: "" + userData.user_profile.user_id,
-				strictCidFormat: false
-			});
-			visitor.pageview("/").send();
-		} else {
-			var visitor = ua("UA-191723723-1");
-			visitor.pageview("/").send();
-		}
 		if (userData && userData.is_verified) {
 			this.refreshToken();
 		}
